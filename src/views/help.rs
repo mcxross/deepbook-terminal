@@ -36,7 +36,7 @@ pub fn render(frame: &mut Frame, rect: Rect) {
     let mut spans = vec![
         Line::from("\n"),
         Line::styled(
-            concat!("  Surflux Terminal v", env!("CARGO_PKG_VERSION")),
+            concat!("  DeepBook Terminal (Strike) v", env!("CARGO_PKG_VERSION")),
             Style::default().add_modifier(Modifier::BOLD),
         ),
         Line::from("\n"),
