@@ -15,6 +15,12 @@ A Rust TUI for monitoring DeepBook activities with live stream updates.
 - Surflux stream API key(s)
 - Surflux REST API key (for OHLCV/trades/depth endpoints)
 
+## Installation
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mcxross/deepbook-terminal/main/install | sh
+```
+
 ## Configuration
 
 `strike` reads configuration from process environment variables.
