@@ -1,0 +1,133 @@
+#!/usr/bin/env sh
+set -eu
+
+repo="${REPO:-mcxross/deepbook-terminal}"
+bin_name='strike'
+package_name='deepbook-terminal'
+install_dir="${INSTALL_DIR:-/usr/local/bin}"
+
+require_cmd() {
+  command -v "$1" >/dev/null 2>&1 || {
+    echo "$1: not found" >&2
+    exit 1
+  }
+}
+
+get_latest_release() {
+  curl --silent --show-error --fail \
+    "https://api.github.com/repos/$repo/releases/latest" |
+    sed -n 's/^[[:space:]]*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p' |
+    head -n 1
+}
+
+detect_platform() {
+  case "$(uname -s)" in
+    Linux)
+      echo "linux"
+      ;;
+    Darwin)
+      echo "darwin"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+detect_arch() {
+  case "$(uname -m)" in
+    x86_64 | amd64)
+      echo "amd64"
+      ;;
+    aarch64 | arm64)
+      echo "arm64"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+detect_libc_suffix() {
+  if [ "$1" != "linux" ]; then
+    echo ""
+    return 0
+  fi
+
+  if command -v ldd >/dev/null 2>&1 && ldd --version 2>&1 | grep -qi "musl"; then
+    echo "-musl"
+  else
+    echo ""
+  fi
+}
+
+require_cmd curl
+require_cmd tar
+require_cmd install
+
+platform="$(detect_platform || true)"
+if [ -z "$platform" ]; then
+  echo "Unsupported OS: $(uname -s). Supported: Linux, macOS." >&2
+  exit 1
+fi
+
+arch="$(detect_arch || true)"
+if [ -z "$arch" ]; then
+  echo "Unsupported architecture: $(uname -m). Supported: x86_64, arm64/aarch64." >&2
+  exit 1
+fi
+
+version="${VERSION:-}"
+if [ -z "$version" ]; then
+  version="$(get_latest_release || true)"
+fi
+if [ -z "$version" ]; then
+  echo "Failed to resolve latest release tag for $repo." >&2
+  exit 1
+fi
+
+case "$version" in
+  v*)
+    ;;
+  *)
+    version="v$version"
+    ;;
+esac
+
+libc_suffix="$(detect_libc_suffix "$platform")"
+asset_name="${package_name}-${platform}${libc_suffix}-${arch}.tar.gz"
+download_url="https://github.com/$repo/releases/download/$version/$asset_name"
+tmp_dir="$(mktemp -d)"
+
+cleanup() {
+  rm -rf "$tmp_dir"
+}
+trap cleanup EXIT INT TERM
+
+echo "Downloading $package_name@$version ..."
+echo "$download_url"
+
+archive_path="$tmp_dir/$asset_name"
+curl --fail --location --show-error --output "$archive_path" "$download_url"
+tar -xzf "$archive_path" -C "$tmp_dir"
+
+if [ ! -f "$tmp_dir/$bin_name" ]; then
+  echo "Release archive did not contain '$bin_name': $asset_name" >&2
+  exit 1
+fi
+
+if [ "$(id -u)" -eq 0 ]; then
+  install -m 0755 "$tmp_dir/$bin_name" "$install_dir/$bin_name"
+else
+  if ! command -v sudo >/dev/null 2>&1; then
+    echo "sudo is required to install into $install_dir." >&2
+    echo "Re-run as root or set INSTALL_DIR to a writable path." >&2
+    exit 1
+  fi
+  sudo install -m 0755 "$tmp_dir/$bin_name" "$install_dir/$bin_name"
+fi
+
+echo "DeepBook Terminal (Strike) $version installed to $install_dir/$bin_name."
+echo ""
+echo "You can use \`strike -h\` to get help."
+echo ""
