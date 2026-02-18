@@ -64,3 +64,8 @@ LOG=error,strike=debug
 ```bash
 cargo run
 ```
+
+## Credits
+
+This project is a heavy adaptation of the [Long Bridge Terminal](https://github.com/longbridge/longbridge-terminal) 
+added with DeepBook-specific features and a new UI.
