@@ -20,8 +20,10 @@ fn get_latest_log_file() -> Option<PathBuf> {
         .filter(|path| {
             path.is_file()
                 && path.file_name().and_then(|n| n.to_str()).is_some_and(|n| {
-                    n.starts_with("surflux-terminal")
-                        && (n.ends_with(".log") || n.contains(".log."))
+                    let has_log_extension = std::path::Path::new(n)
+                        .extension()
+                        .is_some_and(|ext| ext.eq_ignore_ascii_case("log"));
+                    n.starts_with("surflux-terminal") && (has_log_extension || n.contains(".log."))
                 })
         })
         .collect();

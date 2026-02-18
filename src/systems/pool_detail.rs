@@ -234,7 +234,7 @@ pub(crate) fn pool_detail(
     };
 
     let symbol = counter.as_str();
-    let format_volume_u64 = |val: u64| -> String {
+    let format_trade_volume_u64 = |val: u64| -> String {
         if val == 0 {
             EMPTY_PLACEHOLDER.to_string()
         } else {
@@ -242,7 +242,7 @@ pub(crate) fn pool_detail(
             crate::utils::format_volume_decimal(normalized)
         }
     };
-    let format_volume_i64 = |val: i64| -> String {
+    let format_depth_volume_i64 = |val: i64| -> String {
         if val == 0 {
             EMPTY_PLACEHOLDER.to_string()
         } else {
@@ -271,7 +271,10 @@ pub(crate) fn pool_detail(
         price_item("Low".to_string(), pool.quote.low),
         item("Average".to_string(), fmt_decimal(average_price)),
         ListItem::new(" "),
-        item("Volume".to_string(), format_volume_u64(pool.quote.volume)),
+        item(
+            "Volume".to_string(),
+            format_trade_volume_u64(pool.quote.volume),
+        ),
         item(
             "Quote Vol".to_string(),
             crate::ui::text::unit(pool.quote.quote_volume, 2),
@@ -361,7 +364,7 @@ pub(crate) fn pool_detail(
             let price_str = depth.price.format_quote_by_counter(counter).clone();
 
             let volume_str =
-                crate::ui::text::align_right(&format_volume_i64(depth.volume), volume_width);
+                crate::ui::text::align_right(&format_depth_volume_i64(depth.volume), volume_width);
 
             let order_count_str =
                 crate::ui::text::align_right(&format!("({})", depth.order_num.clamp(0, 999)), 6);
@@ -643,7 +646,7 @@ pub(crate) fn pool_detail(
                     };
 
                     let volume_text = crate::ui::text::align_right(
-                        &format_volume_i64(trade.volume),
+                        &format_depth_volume_i64(trade.volume),
                         volume_width,
                     );
 

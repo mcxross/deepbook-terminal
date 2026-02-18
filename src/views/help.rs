@@ -8,7 +8,7 @@ use ratatui::{
 
 use crate::ui::styles;
 
-const HELP_TIPS: &str = r#"  - General ----------------------------------------------------------------------------------
+const HELP_TIPS: &str = r"  - General ----------------------------------------------------------------------------------
 
     ?                               Show help info
     `                               Toggle debug log panel
@@ -28,7 +28,7 @@ const HELP_TIPS: &str = r#"  - General -----------------------------------------
     G                               Switch watchlist group
     t                               Toggle pair detail view
     j, Up Arrow, k, Down Arrow      Switch watching selection
-"#;
+";
 
 pub fn render(frame: &mut Frame, rect: Rect) {
     let rect = crate::ui::rect::centered(100, 40, rect);

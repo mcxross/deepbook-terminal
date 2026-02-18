@@ -118,10 +118,10 @@ impl KlineStore {
             KlineType::PerMinute => "1m",
             KlineType::PerFiveMinutes => "5m",
             KlineType::PerFifteenMinutes => "15m",
-            KlineType::PerThirtyMinutes => "1h",
-            KlineType::PerHour => "1h",
-            KlineType::PerDay => "1d",
-            KlineType::PerWeek | KlineType::PerMonth | KlineType::PerYear => "1d",
+            KlineType::PerThirtyMinutes | KlineType::PerHour => "1h",
+            KlineType::PerDay | KlineType::PerWeek | KlineType::PerMonth | KlineType::PerYear => {
+                "1d"
+            }
         };
 
         tracing::info!(

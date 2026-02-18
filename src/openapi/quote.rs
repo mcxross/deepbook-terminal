@@ -15,8 +15,7 @@ pub async fn fetch_trades(symbol: &str, count: usize) -> Result<Vec<Trade>> {
 pub fn base_asset_decimals(symbol: &str) -> u32 {
     QUOTE_CTX
         .get()
-        .map(|ctx| ctx.base_asset_decimals(symbol))
-        .unwrap_or(DEFAULT_BASE_DECIMALS)
+        .map_or(DEFAULT_BASE_DECIMALS, |ctx| ctx.base_asset_decimals(symbol))
 }
 
 pub fn normalize_base_volume_u64(symbol: &str, raw_volume: u64) -> Decimal {

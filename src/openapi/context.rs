@@ -220,8 +220,7 @@ impl QuoteContext {
         let symbol = normalize_symbol(symbol);
         self.pool_meta
             .get(&symbol)
-            .map(|meta| meta.base_asset_decimals)
-            .unwrap_or(DEFAULT_SCALE_DECIMALS)
+            .map_or(DEFAULT_SCALE_DECIMALS, |meta| meta.base_asset_decimals)
     }
 
     pub async fn list_pools(&self) -> Result<Vec<PoolMetadata>> {
@@ -415,27 +414,22 @@ impl QuoteContext {
             None
         };
 
-        let fallback_price = latest_candle
-            .map(|c| scale_i64(c.close, meta.quote_asset_decimals))
-            .unwrap_or(Decimal::ZERO);
+        let fallback_price = latest_candle.map_or(Decimal::ZERO, |c| {
+            scale_i64(c.close, meta.quote_asset_decimals)
+        });
 
-        let last_done = last_trade
-            .map(|t| scale_i64(t.price, meta.quote_asset_decimals))
-            .unwrap_or(fallback_price);
+        let last_done = last_trade.map_or(fallback_price, |t| {
+            scale_i64(t.price, meta.quote_asset_decimals)
+        });
 
-        let open = latest_candle
-            .map(|c| scale_i64(c.open, meta.quote_asset_decimals))
-            .unwrap_or(last_done);
-        let high = latest_candle
-            .map(|c| scale_i64(c.high, meta.quote_asset_decimals))
-            .unwrap_or(last_done);
-        let low = latest_candle
-            .map(|c| scale_i64(c.low, meta.quote_asset_decimals))
-            .unwrap_or(last_done);
+        let open =
+            latest_candle.map_or(last_done, |c| scale_i64(c.open, meta.quote_asset_decimals));
+        let high =
+            latest_candle.map_or(last_done, |c| scale_i64(c.high, meta.quote_asset_decimals));
+        let low = latest_candle.map_or(last_done, |c| scale_i64(c.low, meta.quote_asset_decimals));
 
-        let prev_close = previous_candle
-            .map(|c| scale_i64(c.close, meta.quote_asset_decimals))
-            .unwrap_or(open);
+        let prev_close =
+            previous_candle.map_or(open, |c| scale_i64(c.close, meta.quote_asset_decimals));
 
         let timestamp = last_trade
             .and_then(|t| parse_datetime(&t.timestamp).ok())
@@ -492,7 +486,7 @@ impl QuoteContext {
         self.pool_keys
             .get(&symbol)
             .map(|entry| entry.value().clone())
-            .ok_or_else(|| anyhow!("missing {}{}", symbol, STREAM_KEY_SUFFIX))
+            .ok_or_else(|| anyhow!("missing {symbol}{STREAM_KEY_SUFFIX}"))
     }
 
     fn rest_api_key(&self, symbol: &str) -> Result<String> {
@@ -504,10 +498,7 @@ impl QuoteContext {
             return Ok(api_key.clone());
         }
         Err(anyhow!(
-            "missing REST API key for {symbol}; set {} or {}{}",
-            REST_KEY_ENV,
-            symbol,
-            REST_KEY_SUFFIX
+            "missing REST API key for {symbol}; set {REST_KEY_ENV} or {symbol}{REST_KEY_SUFFIX}"
         ))
     }
 
@@ -1035,7 +1026,7 @@ fn discover_pool_keys(suffix: &str) -> HashMap<String, String> {
             continue;
         }
 
-        let symbol = normalize_symbol(&format!("{}_{}", base, quote));
+        let symbol = normalize_symbol(&format!("{base}_{quote}"));
         keys.insert(symbol, value);
     }
 

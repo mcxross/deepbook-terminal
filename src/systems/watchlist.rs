@@ -130,7 +130,7 @@ pub fn watch(frame: &mut Frame, rect: Rect, full_mode: bool) {
     let background = Block::default()
         .borders(Borders::ALL)
         .border_style(styles::border())
-        .title(format!(" Watchlist ─── {}[g] ", group_name));
+        .title(format!(" Watchlist ─── {group_name}[g] "));
     frame.render_widget(background, rect);
 
     let mut table_state = WATCHLIST_TABLE.lock().expect("poison");
