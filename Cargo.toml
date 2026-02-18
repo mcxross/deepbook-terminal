@@ -1,0 +1,72 @@
+[package]
+edition = "2021"
+name = "strike"
+version = "0.1.0"
+
+[profile.release]
+debug = true
+lto = true
+opt-level = 'z'
+split-debuginfo = "packed"
+
+[dependencies]
+ansi-parser = "0.9.1"
+anyhow = "1.0"
+atomic = "0.6.0"
+bevy_app = "0.11"
+bevy_ecs = "0.11"
+bytes = "1.10"
+bytemuck = { version = "1.14", features = ["derive"] }
+cli-candlestick-chart = { version = "0.4.1", path = "crates/cli-candlestick-chart", default-features = false }
+crossterm = { version = "0.27", features = ["event-stream"] }
+dashmap = "6.1"
+dirs = "5.0"
+futures = "0.3.28"
+ratatui = "0.24.0"
+rust_decimal = "1.32.0"
+rust_decimal_macros = "1.32.0"
+reqwest = { version = "0.12.12", default-features = false, features = [
+    "json",
+    "rustls-tls",
+    "stream",
+] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+strum = "0.25"
+time = { version = "0.3", features = ["formatting", "local-offset", "macros"] }
+tokio = { version = "1.33.0", features = ["full"] }
+tokio-stream = "0.1"
+tracing = "0.1.40"
+tracing-appender = { version = "0.2.4" }
+tracing-subscriber = { version = "0.3.17", features = [
+    "env-filter",
+    "parking_lot",
+    "time",
+] }
+tui-input = "0.8"
+unicode-width = "0.1.11"
+bitflags = "2.10.0"
+
+[target.'cfg(target_family = "unix")'.dependencies]
+nix = { version = "0.27", default-features = false, features = ["fs"] }
+
+[target.'cfg(target_family = "windows")'.dependencies]
+windows-sys = { version = "0.48.0", features = [
+    "Win32_Foundation",
+    "Win32_Storage_FileSystem",
+    "Win32_System_IO",
+] }
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+cast_possible_truncation = "allow"
+ignored_unit_patterns = "allow"
+implicit_hasher = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+needless_pass_by_value = "allow"
+pedantic = { level = "deny", priority = -1 }
+too_many_arguments = "allow"
+too_many_lines = "allow"
