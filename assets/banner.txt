@@ -1,0 +1,5 @@
+Strike Terminal (v%{version})
+A fast TUI for DeepBook on Sui
+DeepBook is Sui's on-chain central limit order book (CLOB).
+Live watchlists, depth, trades, and OHLCV.
+https://github.com/mcxross/deepbook-terminal
