@@ -65,6 +65,14 @@ SURFLUX_STREAM_BASE_URL=https://flux.surflux.dev
 LOG=error,strike=debug
 ```
 
+## Build Locally
+
+```bash
+git clone https://github.com/mcxross/deepbook-terminal
+cd deepbook-terminal
+cargo build --release
+```
+
 ## Run
 
 ```bash
