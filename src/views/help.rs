@@ -40,7 +40,7 @@ pub fn render(frame: &mut Frame, rect: Rect) {
             Style::default().add_modifier(Modifier::BOLD),
         ),
         Line::from("\n"),
-        Line::from("  https://api.surflux.dev"),
+        Line::from("  https://mcxross.xyz"),
         Line::from("\n"),
     ];
     spans.extend(HELP_TIPS.split('\n').map(Line::from));
